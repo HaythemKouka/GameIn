@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe</title>
+</head>
+<body>
+    <h1>Tic Tac Toe</h1>
+    <p>Joueur actuel: <strong th:text="${currentPlayer}"></strong></p>
+
+    <table border="1">
+        <tr>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[0][0] != ''}"
+                        th:onclick="'play(0,0)'">[[${grid[0][0]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[0][1] != ''}"
+                        th:onclick="'play(0,1)'">[[${grid[0][1]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[0][2] != ''}"
+                        th:onclick="'play(0,2)'">[[${grid[0][2]}]]</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[1][0] != ''}"
+                        th:onclick="'play(1,0)'">[[${grid[1][0]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[1][1] != ''}"
+                        th:onclick="'play(1,1)'">[[${grid[1][1]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[1][2] != ''}"
+                        th:onclick="'play(1,2)'">[[${grid[1][2]}]]</button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[2][0] != ''}"
+                        th:onclick="'play(2,0)'">[[${grid[2][0]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[2][1] != ''}"
+                        th:onclick="'play(2,1)'">[[${grid[2][1]}]]</button>
+            </td>
+            <td>
+                <button th:disabled="${gameOver || currentPlayer == 'O' && firstPlayer == 'computer' || grid[2][2] != ''}"
+                        th:onclick="'play(2,2)'">[[${grid[2][2]}]]</button>
+            </td>
+        </tr>
+    </table>
+
+    <div th:if="${gameOver}">
+        <p th:text="'Le gagnant est: ' + ${winner}"></p>
+    </div>
+
+    <form action="/tictactoe/reset" method="post">
+        <button type="submit">Réinitialiser</button>
+    </form>
+</body>
+</html>

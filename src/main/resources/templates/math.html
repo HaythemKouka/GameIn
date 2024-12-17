@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Game</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .result {
+            font-size: 18px;
+            color: #28a745;
+            margin-top: 20px;
+        }
+        .form-group {
+            text-align: center;
+        }
+        .form-control {
+            width: 50%;
+            margin: 0 auto;
+        }
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            width: 50%;
+            margin: 20px auto;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .user-info {
+            text-align: right;
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Affichage du nom d'utilisateur connecté -->
+        <div class="user-info">
+            Logged in as: <strong sec:authentication="principal.name"></strong>
+        </div>
+
+        <div class="game-header">
+            <h1>Math Game</h1>
+            <h2 class="question">Question: <span th:text="${question}"></span></h2>
+            <h3 class="result">Result: <span th:text="${result}"></span></h3>
+        </div>
+
+        <form action="/math/submit" method="post">
+            <!-- Champ caché pour inclure le nom de l'utilisateur -->
+			<input type="hidden" name="username" th:value="${#authentication.getPrincipal().email}" />
+
+            <div class="form-group">
+                <input type="number" name="userAnswer" class="form-control" required placeholder="Your answer" />
+            </div>
+            <button type="submit" class="btn-submit">Submit Answer</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

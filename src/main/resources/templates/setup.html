@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe - Configuration</title>
+</head>
+<body>
+    <h1>Configurer le jeu</h1>
+    <form action="/tictactoe/setup" method="post">
+        <label for="playerChoice">Choisissez votre symbole:</label>
+        <input type="radio" id="x" name="playerChoice" value="X" checked> X
+        <input type="radio" id="o" name="playerChoice" value="O"> O
+        <br>
+        <label for="firstPlayer">Qui commence?</label>
+        <input type="radio" id="human" name="firstPlayer" value="human" checked> Joueur
+        <input type="radio" id="computer" name="firstPlayer" value="computer"> Ordinateur
+        <br>
+        <button type="submit">Commencer</button>
+    </form>
+</body>
+</html>

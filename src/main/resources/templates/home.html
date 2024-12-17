@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:insert="~{/fragments :: head}"></head>
+
+<body>
+
+    <!--Top Navigation Bar  -->
+    <section th:insert="~{/fragments :: header}"></section>
+
+
+    <!--Title -->
+    <div class="container-fluid ">
+        <br>
+        <h3 th:text = "${title}"></h3>
+        <br>
+    </div>
+
+    <div class="container-fluid">
+        <!-- Show this content if the user is not authenticated -->
+        <div sec:authorize="!isAuthenticated()">
+            <p>Welcome, guest! Please log in to access more features.</p>
+            <a th:href="@{/page/login}">Log in</a>
+        </div>
+
+    </div>
+
+    <div class="row"
+         sec:authorize="isAuthenticated()"
+    >
+        <div
+                class="col-md-3 offset-md-3 col-sm-10 offset-sm-1"
+        >
+            <h6>Player data</h6>
+            <p>Name: <span sec:authentication="principal.name"></span></p>
+            <p>surname: <span sec:authentication="principal.surname"></span></p>
+            <p>registerDate: <span sec:authentication="principal.registerDate"></span></p>
+            <p>Email: <span sec:authentication="principal.email"></span></p>
+        </div>
+        <div
+                class="col-md-3  col-sm-10 offset-sm-1"
+        >
+            <br>
+            <h6>Player statistics summary</h6>
+            <p>AmountGames: <span sec:authentication="principal.amountOfGames"></span></p>
+            <p>Won Games: <span sec:authentication="principal.wonGames"></span></p>
+            <p>Average mark: <span sec:authentication="principal.averageMark"></span></p>
+            <p>Success Rate: <span sec:authentication="principal.successRate"></span></p>
+        </div>
+
+        <br>
+        <hr>
+        <div class="container-fluid">
+            <div sec:authorize="hasAuthority('USER')">Text visible to user.</div>
+            <div sec:authorize="hasAuthority('ADMIN')">Text visible to admin.</div>
+
+        </div>
+
+        <br>
+
+    </div>
+
+
+
+<!--Bellow Bar -->
+<div>
+    <section th:insert="~{/fragments :: find-your-branch}"></section>
+    <footer id="footer" th:insert="~{/fragments :: footer}"> </footer >
+</div>
+
+</body>
+</html>
