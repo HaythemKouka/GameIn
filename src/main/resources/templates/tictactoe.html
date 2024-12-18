@@ -3,8 +3,8 @@
 
 <head th:insert="~{/fragments :: head}"></head>
 
-<body >
-	
+<body>
+
     <style>
         /* General body styling */
         body {
@@ -83,11 +83,23 @@
         .reset-btn:hover {
             background-color: #0056b3;
         }
+
+        /* Custom colors for X and O */
+        .player-X {
+            color: red;
+            font-weight: bold;
+        }
+
+        .player-O {
+            color: green;
+            font-weight: bold;
+        }
+
     </style>
 
-    <div class="card" >
+    <div class="card">
         <h1>Tic Tac Toe</h1>
-        <p>Joueur actuel: <strong th:text="${currentPlayer}"></strong></p>
+        <p>Joueur actuel: <strong th:text="${currentPlayer}" th:class="${currentPlayer == 'X' ? 'player-X' : 'player-O'}"></strong></p>
 
         <form action="/tictactoe/play" method="post">
             <table>
@@ -146,15 +158,15 @@
         </form>
 
         <p th:if="${gameOver}">
-            <span th:if="${winner}">Le gagnant est : [[${winner}]]</span>
+            <span th:if="${winner}" th:text="'Le gagnant est : ' + ${winner}" th:class="${winner == 'X' ? 'player-X' : 'player-O'}"></span>
             <span th:if="${draw}">Match nul!</span>
         </p>
 
         <form action="/tictactoe/reset" method="post">
             <button type="submit" class="reset-btn">Réinitialiser</button>
         </form>
-                <section th:insert="~{/fragments :: footer}"></section>
 
+        <footer id="footer" th:insert="~{/fragments :: footer}"></footer>
     </div>
 
 </body>

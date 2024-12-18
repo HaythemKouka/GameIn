@@ -29,4 +29,9 @@ public class GameController {
         // Logique d'initialisation pour le jeu Math
         return "math"; // Page du jeu Math
     }
+    @GetMapping("/games/memory")
+    public String startMemoryGame() {
+        // Logique d'initialisation pour le jeu Math
+        return "memory"; // Page du jeu Math
+    }
 }

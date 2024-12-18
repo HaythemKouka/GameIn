@@ -63,10 +63,20 @@
 			color: #333;
 			margin-top: 20px;
 		}
+
+		.countdown {
+			font-size: 48px;
+			font-weight: bold;
+			color: orangered;
+			margin-top: 20px;
+			display: none;
+		}
 	</style>
+
 	<section th:insert="~{/fragments :: header}"></section>
 	<div class="container">
 		<h1>Memory Game</h1>
+		<div id="countdown" class="countdown"></div>
 		<div class="timer" id="timer">Time Remaining: 60 seconds</div>
 		<div id="grid" class="grid"></div>
 
@@ -77,6 +87,27 @@
 			let gameOver = false;
 			let timer; // Interval for the timer
 			let timeRemaining = 60; // Time in seconds
+
+			// Countdown before starting the game
+			function startCountdown(callback) {
+				const countdownElement = document.getElementById('countdown');
+				let countdownTime = 5; // 5 seconds countdown
+
+				// Show countdown
+				countdownElement.style.display = 'block';
+				countdownElement.textContent = `Ready to play in: ${countdownTime}`;
+
+				const countdownInterval = setInterval(() => {
+					countdownTime--;
+					countdownElement.textContent = `Ready to play in: ${countdownTime}`;
+
+					if (countdownTime <= 0) {
+						clearInterval(countdownInterval);
+						countdownElement.style.display = 'none';
+						callback(); // Start the game after countdown
+					}
+				}, 1000);
+			}
 
 			// Start a new game
 			function startGame(colorsList) {
@@ -180,10 +211,12 @@
 			// Initialize the game on page load
 			window.onload = function () {
 				const colorsList = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'red', 'blue', 'green', 'yellow', 'purple', 'orange'];
-				startGame(colorsList);
+				startCountdown(() => startGame(colorsList));
 			};
 		</script>
 	</div>
+	    <section th:insert="~{/fragments :: find-your-branch}"></section>
+    <footer id="footer" th:insert="~{/fragments :: footer}"> </footer >
 </body>
 
 </html>
