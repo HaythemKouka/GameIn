@@ -4,15 +4,57 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rock Paper Scissors</title>
+    <style>
+        .choice-button {
+            font-size: 20px;
+            padding: 10px 20px;
+            margin: 10px;
+        }
+        .choice-images img {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+        }
+        .result {
+            font-size: 24px;
+            margin-top: 20px;
+        }
+        .choice-images {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     <h1>Rock Paper Scissors</h1>
-    <h2>Result: <span th:text="${result}"></span></h2>
 
+    <!-- Formulaire pour choisir une option -->
     <form action="/rps/play" method="post">
-        <button type="submit" name="choice" value="rock">Rock</button>
-        <button type="submit" name="choice" value="paper">Paper</button>
-        <button type="submit" name="choice" value="scissors">Scissors</button>
+        <button type="submit" name="choice" value="rock" class="choice-button">
+            <img src="/images/rock.png" alt="Rock">
+        </button>
+        <button type="submit" name="choice" value="paper" class="choice-button">
+            <img src="/images/paper.png" alt="Paper">
+        </button>
+        <button type="submit" name="choice" value="scissors" class="choice-button">
+            <img src="/images/scissors.png" alt="Scissors">
+        </button>
+		<input type="hidden" name="username" th:value="${#authentication.getPrincipal().email}" />
+
     </form>
+
+    <!-- Affichage des choix des utilisateurs et des résultats -->
+    <div class="result">
+        <h2>Your choice:</h2>
+        <div class="choice-images">
+            <img th:src="@{'/images/' + ${userChoice} + '.png'}" alt="User's Choice">
+        </div>
+
+        <h2>Computer's choice:</h2>
+        <div class="choice-images">
+            <img th:src="@{'/images/' + ${computerChoice} + '.png'}" alt="Computer's Choice">
+        </div>
+
+        <h2>Result: <span th:text="${result}"></span></h2>
+    </div>
 </body>
 </html>
