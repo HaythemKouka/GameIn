@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class TicTacToeController {
 
-    // Initialiser la partie
+    // Initialiser la grille de jeu
     private void initializeGame(HttpSession session) {
         String[][] grid = new String[3][3];
         for (int i = 0; i < 3; i++) {
@@ -23,164 +24,155 @@ public class TicTacToeController {
         session.setAttribute("grid", grid);
         session.setAttribute("gameOver", false);
         session.setAttribute("winner", null);
+        session.setAttribute("draw", false); // Pour gérer les matchs nuls
     }
 
-    // Afficher la page de configuration initiale (choix du symbole et du premier joueur)
+    // Page de configuration
     @GetMapping("/tictactoe/setup")
     public String setupPage() {
-        return "setup";
+        return "setup"; // Retourne la page de configuration
     }
 
-    // Configuration du jeu avec le choix de X ou O et qui commence
+    // Configurer le jeu selon les choix
     @PostMapping("/tictactoe/setup")
     public String setupGame(@RequestParam String playerChoice, @RequestParam String firstPlayer, HttpSession session) {
-        // Enregistrer le choix du joueur
         session.setAttribute("playerChoice", playerChoice);
+        session.setAttribute("computerChoice", playerChoice.equals("X") ? "O" : "X");
         session.setAttribute("firstPlayer", firstPlayer);
 
-        // Initialiser la grille et les autres paramètres du jeu
-        initializeGame(session);
+        initializeGame(session); // Réinitialiser la grille
 
-        // Déterminer qui commence
-        String currentPlayer = firstPlayer.equals("human") ? playerChoice : (playerChoice.equals("X") ? "O" : "X");
+        // Définir le joueur actuel
+        String currentPlayer = firstPlayer.equals("Joueur") ? playerChoice : session.getAttribute("computerChoice").toString();
         session.setAttribute("currentPlayer", currentPlayer);
 
-        // Si l'ordinateur commence, il joue tout de suite
-        if (firstPlayer.equals("computer")) {
+        // Si l'ordinateur commence, il joue immédiatement
+        if (firstPlayer.equals("Ordinateur")) {
             playComputerTurn(session);
         }
 
-        return "redirect:/tictactoe"; // Afficher la grille de jeu après la configuration
+        return "redirect:/tictactoe"; // Afficher la grille de jeu
     }
 
-    // Afficher la grille de jeu
+    // Afficher la page de jeu
     @GetMapping("/tictactoe")
     public String showGamePage(Model model, HttpSession session) {
         if (session.getAttribute("grid") == null) {
             initializeGame(session);
         }
 
-        String[][] grid = (String[][]) session.getAttribute("grid");
-        String currentPlayer = (String) session.getAttribute("currentPlayer");
-        String winner = (String) session.getAttribute("winner");
-        boolean gameOver = (boolean) session.getAttribute("gameOver");
+        model.addAttribute("grid", session.getAttribute("grid"));
+        model.addAttribute("currentPlayer", session.getAttribute("currentPlayer"));
+        model.addAttribute("winner", session.getAttribute("winner"));
+        model.addAttribute("gameOver", session.getAttribute("gameOver"));
+        model.addAttribute("draw", session.getAttribute("draw"));
 
-        model.addAttribute("grid", grid);
-        model.addAttribute("currentPlayer", currentPlayer);
-        model.addAttribute("winner", winner);
-        model.addAttribute("gameOver", gameOver);
-
-        return "tictactoe"; // Retourner la vue du jeu
+        return "tictactoe"; // Vue de la grille
     }
 
-    // Jouer un coup
+    // Jouer un tour
     @PostMapping("/tictactoe/play")
-    public String play(@RequestParam String cell, HttpSession session, Model model) {
+    public String play(@RequestParam String cell, HttpSession session) {
         String[][] grid = (String[][]) session.getAttribute("grid");
         String currentPlayer = (String) session.getAttribute("currentPlayer");
         boolean gameOver = (boolean) session.getAttribute("gameOver");
-        String winner = (String) session.getAttribute("winner");
 
+        // Vérifier si le jeu est déjà terminé
         if (gameOver) {
-            return "redirect:/tictactoe"; // Si le jeu est terminé, on redirige vers la page d'affichage
+            return "redirect:/tictactoe";
         }
 
+        // Obtenir les indices de la cellule
         String[] indices = cell.split(",");
         int row = Integer.parseInt(indices[0]);
         int col = Integer.parseInt(indices[1]);
 
-        // Vérifier si la case est déjà occupée
+        // Si la cellule est déjà occupée
         if (!grid[row][col].equals("")) {
-            model.addAttribute("error", "Cette case est déjà occupée !");
-            model.addAttribute("grid", grid);
-            model.addAttribute("currentPlayer", currentPlayer);
-            model.addAttribute("winner", winner);
-            return "tictactoe"; // Retourner sans effectuer d'action si la case est occupée
+            return "redirect:/tictactoe";
         }
 
-        // Mettre à jour la case avec le symbole du joueur
+        // Mettre à jour la cellule avec le symbole du joueur actuel
         grid[row][col] = currentPlayer;
 
-        // Vérifier si le joueur a gagné
-        if (checkWinner(grid, row, col, currentPlayer)) {
+        // Vérifier la victoire
+        if (checkWinner(grid, currentPlayer)) {
             session.setAttribute("gameOver", true);
             session.setAttribute("winner", currentPlayer);
-            model.addAttribute("winner", "Le joueur " + currentPlayer + " a gagné !");
+        } else if (isDraw(grid)) {
+            session.setAttribute("gameOver", true);
+            session.setAttribute("draw", true); // Match nul
         } else {
             // Passer au joueur suivant
-            currentPlayer = (currentPlayer.equals("X")) ? "O" : "X";
+            currentPlayer = currentPlayer.equals("X") ? "O" : "X";
             session.setAttribute("currentPlayer", currentPlayer);
 
-            // Si c'est l'ordinateur qui doit jouer, on déclenche son coup
-            if (currentPlayer.equals("O") && session.getAttribute("firstPlayer").equals("human")) {
+            // Si c'est au tour de l'ordinateur, il joue immédiatement
+            if (currentPlayer.equals(session.getAttribute("computerChoice"))) {
                 playComputerTurn(session);
             }
         }
 
-        // Mettre à jour la session avec la grille mise à jour
         session.setAttribute("grid", grid);
-
-        // Retourner la vue de jeu avec la grille mise à jour
-        model.addAttribute("grid", grid);
-        model.addAttribute("currentPlayer", currentPlayer);
-        return "tictactoe";
+        return "redirect:/tictactoe";
     }
 
-
-    // Jouer un coup pour l'ordinateur
+    // Jouer pour l'ordinateur
     private void playComputerTurn(HttpSession session) {
         String[][] grid = (String[][]) session.getAttribute("grid");
+        String computerChoice = (String) session.getAttribute("computerChoice");
         Random rand = new Random();
         int row, col;
 
-        // L'ordinateur fait un coup aléatoire jusqu'à ce qu'il trouve une case vide
+        // Trouver une cellule vide
         do {
             row = rand.nextInt(3);
             col = rand.nextInt(3);
-        } while (!grid[row][col].equals("")); // Trouver une case vide
+        } while (!grid[row][col].equals(""));
 
-        String computerChoice = (String) session.getAttribute("playerChoice");
-        grid[row][col] = computerChoice; // L'ordinateur joue le symbole attribué
+        grid[row][col] = computerChoice;
 
-        // Vérifier si l'ordinateur a gagné
-        if (checkWinner(grid, row, col, computerChoice)) {
+        // Vérifier la victoire de l'ordinateur
+        if (checkWinner(grid, computerChoice)) {
             session.setAttribute("gameOver", true);
             session.setAttribute("winner", computerChoice);
+        } else if (isDraw(grid)) {
+            session.setAttribute("gameOver", true);
+            session.setAttribute("draw", true);
         } else {
-            // Passer au joueur humain
-            session.setAttribute("currentPlayer", "X");
+            // Passer au tour du joueur
+            session.setAttribute("currentPlayer", session.getAttribute("playerChoice"));
         }
 
         session.setAttribute("grid", grid);
     }
 
     // Vérifier si un joueur a gagné
-    private boolean checkWinner(String[][] grid, int row, int col, String currentPlayer) {
-        // Vérifier la ligne
-        if (grid[row][0].equals(currentPlayer) && grid[row][1].equals(currentPlayer) && grid[row][2].equals(currentPlayer)) {
-            return true;
+    private boolean checkWinner(String[][] grid, String player) {
+        // Vérifier les lignes, colonnes et diagonales
+        for (int i = 0; i < 3; i++) {
+            if (grid[i][0].equals(player) && grid[i][1].equals(player) && grid[i][2].equals(player)) return true;
+            if (grid[0][i].equals(player) && grid[1][i].equals(player) && grid[2][i].equals(player)) return true;
         }
-        // Vérifier la colonne
-        if (grid[0][col].equals(currentPlayer) && grid[1][col].equals(currentPlayer) && grid[2][col].equals(currentPlayer)) {
-            return true;
-        }
-        // Vérifier la diagonale principale
-        if (row == col && grid[0][0].equals(currentPlayer) && grid[1][1].equals(currentPlayer) && grid[2][2].equals(currentPlayer)) {
-            return true;
-        }
-        // Vérifier la diagonale secondaire
-        if (row + col == 2 && grid[0][2].equals(currentPlayer) && grid[1][1].equals(currentPlayer) && grid[2][0].equals(currentPlayer)) {
-            return true;
-        }
+        if (grid[0][0].equals(player) && grid[1][1].equals(player) && grid[2][2].equals(player)) return true;
+        if (grid[0][2].equals(player) && grid[1][1].equals(player) && grid[2][0].equals(player)) return true;
         return false;
+    }
+
+    // Vérifier si toutes les cellules sont remplies (match nul)
+    private boolean isDraw(String[][] grid) {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (grid[i][j].equals("")) return false; // Cellule vide
+            }
+        }
+        return true;
     }
 
     // Réinitialiser le jeu
     @PostMapping("/tictactoe/reset")
-    public String resetGame(HttpSession session, Model model) {
-        initializeGame(session); // Réinitialiser le jeu
-        model.addAttribute("grid", session.getAttribute("grid"));
-        model.addAttribute("currentPlayer", session.getAttribute("currentPlayer"));
-        return "tictactoe"; // Retourner la vue du jeu
+    public String resetGame(HttpSession session) {
+        initializeGame(session);
+        return "redirect:/tictactoe/setup"; // Retourner à la configuration
     }
 }

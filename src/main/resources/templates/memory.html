@@ -1,69 +1,189 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jeu de mémoire</title>
-    <style>
-        .card {
-            width: 100px;
-            height: 100px;
-            display: inline-block;
-            background-color: gray;
-            margin: 10px;
-            text-align: center;
-            line-height: 100px;
-            font-size: 24px;
-            color: white;
-            cursor: pointer;
-        }
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
-        .flipped {
-            background-color: lightgreen;
-        }
-    </style>
-</head>
+<head th:insert="~{/fragments :: head}"></head>
+
 <body>
-    <h1>Jeu de mémoire</h1>
-    <div id="game-board">
-        <!-- Les cartes sont affichées ici avec un contrôle basé sur la liste flippedCards -->
-        <div th:each="card, cardIndex : ${#numbers.sequence(0, 7)}">
-            <div class="card" 
-                 th:classappend="${flippedCards.contains(cardIndex) ? 'flipped' : ''}" 
-                 th:text="${flippedCards.contains(cardIndex) ? cardValues[cardIndex] : ''}" 
-                 data-index="[[${cardIndex}]]"></div>
-        </div>
-    </div>
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+			background-color: #f4f4f9;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+		}
 
-    <script>
-        document.querySelectorAll('.card').forEach(function(card) {
-            card.addEventListener('click', function() {
-                let index = parseInt(card.getAttribute('data-index'));
+		h1 {
+			font-size: 36px;
+			color: orangered;
+			margin-top: 50px;
+		}
 
-                // Exemple d'AJAX pour envoyer l'index de la carte retournée
-                fetch('/game/flipCard?index=' + index, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Mettre à jour l'état des cartes après la réponse du serveur
-                    document.querySelectorAll('.card').forEach(function(card, cardIndex) {
-                        if (data.includes(cardIndex)) {
-                            card.classList.add('flipped');
-                            card.innerText = cardValues[cardIndex];  // Afficher la valeur de la carte
-                        } else {
-                            card.classList.remove('flipped');
-                            card.innerText = '';  // Vider le texte pour les cartes non retournées
-                        }
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-            });
-        });
-    </script>
+		.container {
+			max-width: 1100px;
+			margin: 50px auto;
+			padding: 20px;
+			background-color: #fff;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			border-radius: 8px;
+		}
 
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(4, 100px);
+			gap: 10px;
+			justify-content: center;
+			margin-top: 20px;
+		}
+
+		.card {
+			width: 100px;
+			height: 100px;
+			background-color: #ccc;
+			border: 1px solid #333;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-size: 24px;
+			cursor: pointer;
+			position: relative;
+			transition: background-color 0.6s;
+		}
+
+		.card.hidden {
+			background-color: #ccc;
+		}
+
+		.card.visible {
+			cursor: default;
+		}
+
+		.timer {
+			font-size: 24px;
+			color: #333;
+			margin-top: 20px;
+		}
+	</style>
+	<section th:insert="~{/fragments :: header}"></section>
+	<div class="container">
+		<h1>Memory Game</h1>
+		<div class="timer" id="timer">Time Remaining: 60 seconds</div>
+		<div id="grid" class="grid"></div>
+
+		<script>
+			let selectedCards = [];
+			let visibleCards = [];
+			let colors = [];
+			let gameOver = false;
+			let timer; // Interval for the timer
+			let timeRemaining = 60; // Time in seconds
+
+			// Start a new game
+			function startGame(colorsList) {
+				colors = shuffle(colorsList);
+				visibleCards = Array(colors.length).fill(false);
+				selectedCards = [];
+				gameOver = false;
+				timeRemaining = 60;
+				updateTimer();
+				clearInterval(timer); // Clear any previous timer
+				timer = setInterval(updateTimer, 1000); // Start new timer
+				renderCards();
+			}
+
+			// Shuffle function
+			function shuffle(array) {
+				let currentIndex = array.length, randomIndex, temporaryValue;
+				while (currentIndex !== 0) {
+					randomIndex = Math.floor(Math.random() * currentIndex);
+					currentIndex -= 1;
+					temporaryValue = array[currentIndex];
+					array[currentIndex] = array[randomIndex];
+					array[randomIndex] = temporaryValue;
+				}
+				return array;
+			}
+
+			// Update the timer display and check for timeout
+			function updateTimer() {
+				const timerElement = document.getElementById('timer');
+				if (timeRemaining > 0) {
+					timerElement.textContent = `Time Remaining: ${timeRemaining} seconds`;
+					timeRemaining--;
+				} else {
+					clearInterval(timer);
+					endGame(false); // End the game with a loss
+				}
+			}
+
+			// Render the game grid
+			function renderCards() {
+				const grid = document.getElementById('grid');
+				grid.innerHTML = '';
+				colors.forEach((color, index) => {
+					const cardElement = document.createElement('div');
+					cardElement.classList.add('card');
+					cardElement.classList.add(visibleCards[index] ? 'visible' : 'hidden');
+					cardElement.setAttribute('onclick', `revealCard(${index})`);
+					if (visibleCards[index]) {
+						cardElement.style.backgroundColor = color;
+					} else {
+						cardElement.style.backgroundColor = '#ccc';
+					}
+					grid.appendChild(cardElement);
+				});
+			}
+
+			// Reveal a card
+			function revealCard(index) {
+				if (gameOver || visibleCards[index] || selectedCards.length === 2) {
+					return;
+				}
+				visibleCards[index] = true;
+				selectedCards.push(index);
+				renderCards();
+				if (selectedCards.length === 2) {
+					const [firstIndex, secondIndex] = selectedCards;
+					if (colors[firstIndex] === colors[secondIndex]) {
+						selectedCards = [];
+						checkGameOver();
+					} else {
+						setTimeout(() => {
+							visibleCards[firstIndex] = false;
+							visibleCards[secondIndex] = false;
+							selectedCards = [];
+							renderCards();
+						}, 2000);
+					}
+				}
+			}
+
+			// Check if the game is over
+			function checkGameOver() {
+				if (!visibleCards.includes(false)) {
+					clearInterval(timer);
+					endGame(true); // Game won
+				}
+			}
+
+			// End the game
+			function endGame(win) {
+				gameOver = true;
+				if (win) {
+					setTimeout(() => alert("Congratulations, you won! Starting a new game..."), 500);
+				} else {
+					alert("Time's up! You lost. Starting a new game...");
+				}
+				startGame(colors); // Restart the game
+			}
+
+			// Initialize the game on page load
+			window.onload = function () {
+				const colorsList = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+				startGame(colorsList);
+			};
+		</script>
+	</div>
 </body>
+
 </html>

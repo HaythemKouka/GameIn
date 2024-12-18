@@ -1,22 +1,114 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Configuration</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+
+<head th:insert="~{/fragments :: head}"></head>
+
 <body>
-    <h1>Configurer le jeu</h1>
-    <form action="/tictactoe/setup" method="post">
-        <label for="playerChoice">Choisissez votre symbole:</label>
-        <input type="radio" id="x" name="playerChoice" value="X" checked> X
-        <input type="radio" id="o" name="playerChoice" value="O"> O
-        <br>
-        <label for="firstPlayer">Qui commence?</label>
-        <input type="radio" id="human" name="firstPlayer" value="human" checked> Joueur
-        <input type="radio" id="computer" name="firstPlayer" value="computer"> Ordinateur
-        <br>
-        <button type="submit">Commencer</button>
-    </form>
+	 <style>
+        /* General styling for the page */
+        
+   body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+            display: contents;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-list {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .game-list li {
+            margin: 20px;
+            text-align: center;
+            width: 200px;
+        }
+
+        .game-list a {
+            font-size: 20px;
+            color: #333;
+            text-decoration: none;
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .game-list a:hover {
+            text-decoration: underline;
+        }
+
+        .game-item {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .game-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .game-image {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        /* Add some spacing to the header */
+        .container-fluid {
+            padding-top: 20px;
+        }
+           .form-wrapper {
+            padding: 20px 30px;
+            border: 1px solid #ddd;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+	    <section th:insert="~{/fragments :: header}"></section>
+
+<div class="form-wrapper" style="margin-top:10%; margin-left: 40%; width: 50%;" >
+	<h1>Configurer le jeu</h1>
+	<form action="/tictactoe/setup" method="post">
+		<label>Choisissez votre symbole:</label>
+		<input type="radio" name="playerChoice" value="X" required> X
+		<input type="radio" name="playerChoice" value="O" required> O
+		<br>
+		<label>Qui commence?</label>
+		<input type="radio" name="firstPlayer" value="Joueur" required> Joueur
+		<input type="radio" name="firstPlayer" value="Ordinateur" required> Ordinateur
+		<br>
+		<button type="submit">Commencer</button>
+	</form>
+</div>
+    <section th:insert="~{/fragments :: footer}"></section>
+
 </body>
+
 </html>
