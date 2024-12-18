@@ -1,106 +1,111 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 
 <head th:insert="~{/fragments :: head}"></head>
 
 <body>
-	  <style>
-        /* General styling for the page */
-        body {
-            background-color: #f8f9fa;
-            font-family: Arial, sans-serif;
-        }
+	<style>
+		/* General styling for the page */
+		body {
+			background-color: #f8f9fa;
+			font-family: Arial, sans-serif;
+		}
 
-        .game-list {
-            list-style-type: none;
-            padding: 0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-        }
+		.game-list {
+			list-style-type: none;
+			padding: 0;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-around;
+		}
 
-        .game-list li {
-            margin: 20px;
-            text-align: center;
-            width: 200px;
-        }
+		.game-list li {
+			margin: 20px;
+			text-align: center;
+			width: 200px;
+		}
 
-        .game-list a {
-            font-size: 20px;
-            color: #333;
-            text-decoration: none;
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
+		.game-list a {
+			font-size: 20px;
+			color: #333;
+			text-decoration: none;
+			display: block;
+			margin-top: 10px;
+			font-weight: bold;
+		}
 
-        .game-list a:hover {
-            text-decoration: underline;
-        }
+		.game-list a:hover {
+			text-decoration: underline;
+		}
 
-        .game-item {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease-in-out;
-        }
+		.game-item {
+			background-color: #fff;
+			border-radius: 8px;
+			padding: 15px;
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease-in-out;
+		}
 
-        .game-item:hover {
-            transform: translateY(-10px);
-        }
+		.game-item:hover {
+			transform: translateY(-10px);
+		}
 
-        .game-image {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-        }
+		.game-image {
+			width: 100%;
+			height: auto;
+			border-radius: 8px;
+		}
 
-        /* Add some spacing to the header */
-        .container-fluid {
-            padding-top: 20px;
-        }
-    </style>
- 
-    <!-- Header Section (Fragment) -->
-    <section th:insert="~{/fragments :: header}"></section>
+		/* Add some spacing to the header */
+		.container-fluid {
+			padding-top: 20px;
+		}
+	</style>
 
-    <!-- Main Content -->
-    <div class="container-fluid">
-        <h1 class="text-center my-4">Available Games</h1>
-        <ul class="game-list">
-            <li>   <a href="/games/tictactoe">
-                <div class="game-item">
-                    <img src="images/tictactoe.png" alt="Tic Tac Toe" class="game-image">
-                 Tic Tac Toe
-                </div></a>
-            </li>
-            <li> <a href="/games/rps">
-                <div class="game-item">
-                    <img src="images/rps.png" alt="Rock Paper Scissors" class="game-image">
-                   Rock Paper Scissors
-                </div></a>
-            </li>
-             <li> <a href="/games/memory">
-                <div class="game-item">
-                    <img src="images/memory.png" alt="Memory Game" class="game-image">
-                   Memory Game
-                </div></a>
-            </li>
-            <li> <a href="/games/math">
-                <div class="game-item">
-                    <img src="images/mathmental.png" alt="Math Game" class="game-image">
-                   Math Game
-                </div>
+	<!-- Header Section (Fragment) -->
+	<section th:insert="~{/fragments :: header}"></section>
+
+	<!-- Main Content -->
+	<div class="container-fluid">
+		<h1 class="text-center my-4">Available Games</h1>
+		<ul class="game-list">
+			<li> <a href="/games/tictactoe">
+					<div class="game-item">
+						<img src="images/tictactoe.png" alt="Tic Tac Toe" class="game-image">
+						Tic Tac Toe
+					</div>
 				</a>
-            </li>
-             
-        </ul>
-    </div>
+			</li>
+			<li> <a href="/games/rps">
+					<div class="game-item">
+						<img src="images/rps.png" alt="Rock Paper Scissors" class="game-image">
+						Rock Paper Scissors
+					</div>
+				</a>
+			</li>
+			<li> <a href="/games/memory">
+					<div class="game-item">
+						<img src="images/memory.png" alt="Memory Game" class="game-image">
+						Memory Game
+					</div>
+				</a>
+			</li>
+			<li> <a href="/games/math">
+					<div class="game-item">
+						<img src="images/mathmental.png" alt="Math Game" class="game-image">
+						Math Game
+					</div>
+				</a>
+			</li>
 
-    <!-- Footer Section (Fragment) -->
-    <section th:insert="~{/fragments :: footer}"></section>
+		</ul>
+	</div>
+
+	<!-- Footer Section (Fragment) -->
+	<section th:insert="~{/fragments :: find-your-branch}"></section>
+
+	<section th:insert="~{/fragments :: footer}"></section>
 
 </body>
+
 </html>
