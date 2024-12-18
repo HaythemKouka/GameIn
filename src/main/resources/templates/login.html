@@ -2,18 +2,15 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 
-
 <head th:insert="~{/fragments :: head}"></head>
-
 
 <body>
 
-<!--Top Navigation Bar  -->
+<!--Top Navigation Bar-->
 <section th:insert="~{/fragments :: header}"></section>
 
-
-<!--Title -->
-<div class="container-fluid ">
+<!--Title-->
+<div class="container-fluid">
     <br>
     <h3 th:text="${title}"></h3>
     <br>
@@ -26,18 +23,17 @@
         <div class="col-md-6 offset-md-3 col-sm-12">
 
             <div th:if="${param.registrado}">
-                <div class="alert alert-info"> Se ha registrado correctamente</div>
+                <div class="alert alert-info"> Registration successful</div>
             </div>
             <div th:if="${param.exito}">
-                <div class="alert alert-info"> Login correcto</div>
+                <div class="alert alert-info"> Login successful</div>
             </div>
             <div th:if="${param.logout}">
-                <div class="alert alert-warning"> Ha cerrado sessión correctamente</div>
+                <div class="alert alert-warning"> You have logged out successfully</div>
             </div>
             <div th:if="${param.error}" class="alert alert-danger">
-                Error - Username or email doesn't exists!
+                Error - Username or email does not exist!
             </div>
-
 
             <form th:action="@{/page/login}" method="post" role="form">
                 <div class="form-group">
@@ -68,12 +64,11 @@
                         value="Log in"
                         class="form-control  btn btn-primary">
 
-
             </form>
 
             <br>
             <a href="#" th:href="@{/page/register}" style="color:MediumSeaGreen;">
-                Don't have an account already? Register Here.</a>
+                Don't have an account yet? Register Here.</a>
             <br>
             <a href="#">Forgot password?</a>
             <br>
@@ -83,10 +78,10 @@
 
 </section>
 
-<!--Bellow Bar -->
+<!--Below Bar-->
 <div class="">
     <section th:insert="~{/fragments :: find-your-branch}"></section>
-    <footer id="footer" th:insert="~{/fragments :: footer}"> </footer >
+    <footer id="footer" th:insert="~{/fragments :: footer}"></footer>
 </div>
 
 </body>
